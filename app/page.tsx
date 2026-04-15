@@ -7,11 +7,11 @@ export default function Home() {
             <h1 className="text-black mb-6 text-6xl font-bold">
               Seamlessly track your job applications.
             </h1>
-            <p className="text-muted-foreground">
+            <p className="text-muted-foreground mb-10 text-xl">
               Manage your job applications in one place.
             </p>
           </div>
-          <div>
+          <div className="flex flex-col items-center gap-4">
             <button>Start for free!</button>
             <p>Free forever. No credit card required.</p>
           </div>
