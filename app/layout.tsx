@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
-import "./globals.css";
 import { Quicksand } from "next/font/google";
+import { Geist, Geist_Mono } from "next/font/google";
 import Navbar from "@/components/navbar";
+import "./globals.css";
 
 const quicksand = Quicksand({
   subsets: ["latin"],
@@ -33,7 +33,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} ${quicksand.variable} antialiased`}
+        className={`${quicksand.variable} ${geistSans.variable} ${geistMono.variable} antialiased`}
       >
         <Navbar />
         {children}
