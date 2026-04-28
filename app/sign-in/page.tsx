@@ -64,7 +64,13 @@ export default function SignIn() {
         <form onSubmit={handleSubmit} className="space-y-4">
           <CardContent className="space-y-4">
             {error && (
-              <div className="rounded-md bg-destructive/15 p-3 text-sm text-destructive"></div>
+              <div
+                className="rounded-md bg-destructive/15 p-3 text-sm text-destructive"
+                role="alert"
+                aria-live="polite"
+              >
+                {error || "An unexpected error occurred."}
+              </div>
             )}
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
