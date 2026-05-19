@@ -15,33 +15,54 @@ import { Input } from "./ui/input";
 import { Label } from "./ui/label";
 import { Textarea } from "./ui/textarea";
 import { useState } from "react";
+import { createJobApplication } from "@/lib/actions/job-applicatins";
 
 interface CreateJobApplicationDialogProps {
   columnId: string;
   boardId: string;
 }
 
+const INITIAL_FORM_DATA = {
+  company: "",
+  position: "",
+  location: "",
+  notes: "",
+  salary: "",
+  jobUrl: "",
+  tags: "",
+  description: "",
+};
+
 export default function CreateJobApplicationDialog({
   columnId,
   boardId,
 }: CreateJobApplicationDialogProps) {
   const [open, setOpen] = useState<boolean>(false);
-  const [formData, setFormData] = useState({
-    company: "",
-    position: "",
-    location: "",
-    notes: "",
-    salary: "",
-    jobUrl: "",
-    tags: "",
-    description: "",
-  });
+  const [formData, setFormData] = useState(INITIAL_FORM_DATA);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
 
     try {
-    } catch (err) {}
+      const result = await createJobApplication({
+        ...formData,
+        columnId,
+        boardId,
+        tags: formData.tags
+          .split(",")
+          .map((tag) => tag.trim())
+          .filter((tag) => tag.length > 0),
+      });
+
+      if (!result.error) {
+        setFormData(INITIAL_FORM_DATA);
+        setOpen(false);
+      } else {
+        console.error("Failed to create job: ", result.error);
+      }
+    } catch (err) {
+      console.error(err);
+    }
   }
 
   return (
