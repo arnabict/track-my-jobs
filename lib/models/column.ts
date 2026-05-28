@@ -38,5 +38,5 @@ const ColumnSchema = new Schema<IColumn>(
   },
 );
 
-export default mongoose.models.Board ||
-  mongoose.model<IColumn>("Board", ColumnSchema);
+export default mongoose.models.Column ||
+  mongoose.model<IColumn>("Column", ColumnSchema);
