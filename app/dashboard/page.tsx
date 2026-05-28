@@ -2,7 +2,7 @@ import KanbanBoard from "@/components/kanban-board";
 import { getSession } from "@/lib/auth/auth";
 import connectDB from "@/lib/db";
 import { Board } from "@/lib/models";
-import board from "@/lib/models/board";
+import type { Board as BoardType } from "@/lib/models/models.types";
 import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
@@ -14,12 +14,20 @@ export default async function Dashboard() {
 
   await connectDB();
 
-  await Board.findOne({
+  const board = await Board.findOne({
     userId: session.user.id,
     name: "Job Hunt",
-  }).populate({
-    path: "columns",
-  });
+  })
+    .populate({
+      path: "columns",
+    })
+    .lean();
+
+  if (!board) {
+    redirect("/");
+  }
+
+  const plainBoard = JSON.parse(JSON.stringify(board)) as BoardType;
 
   return (
     <div className="min-h-screen bg-white">
@@ -28,10 +36,7 @@ export default async function Dashboard() {
           <h1 className="text-3xl font-bold text-black">Job Hunt</h1>
           <p className="text-gray-600">Track your job applications</p>
         </div>
-        <KanbanBoard
-          board={JSON.parse(JSON.stringify(board))}
-          userId={session.user.id}
-        />
+        <KanbanBoard board={plainBoard} userId={session.user.id} />
       </div>
     </div>
   );
