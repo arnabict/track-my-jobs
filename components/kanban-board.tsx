@@ -9,6 +9,7 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react";
+import type { ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import {
   DropdownMenu,
@@ -17,17 +18,17 @@ import {
   DropdownMenuTrigger,
 } from "./ui/dropdown-menu";
 import { Button } from "./ui/button";
-import { Column } from "@/lib/models/models.types";
+import { Board, Column } from "@/lib/models/models.types";
 import CreateJobApplicationDialog from "./create-job-application-dialog";
 
 interface KanbanBoardProps {
-  board: string;
-  userId: string;
+  board: Board;
+  userId?: string;
 }
 
 interface ColConfig {
   color: string;
-  icon: React.ReactNode;
+  icon: ReactNode;
 }
 
 const COLUMN_CONFIG: Array<ColConfig> = [
@@ -100,8 +101,9 @@ function DroppableColumn({
   );
 }
 
-export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
+export default function KanbanBoard({ board }: KanbanBoardProps) {
   const columns = board.columns;
+
   return (
     <>
       <div>
@@ -113,7 +115,7 @@ export default function KanbanBoard({ board, userId }: KanbanBoardProps) {
             };
             return (
               <DroppableColumn
-                key={key}
+                key={col._id}
                 column={col}
                 config={config}
                 boardId={board._id}
