@@ -19,7 +19,7 @@ import {
 } from "./ui/dropdown-menu";
 import { Board, Column, JobApplication } from "@/lib/models/models.types";
 import CreateJobApplicationDialog from "./create-job-application-dialog";
-
+import JobApplicationCard from "./job-application-card";
 interface KanbanBoardProps {
   board: Board;
   userId?: string;
@@ -95,9 +95,9 @@ function DroppableColumn({
       <CardContent className="space-y-2 pt-4 bg-gray-50/50 min-h-[400px] rounded-b-lg">
         {sortedJobs.map((job) => (
           <SortableJobCard
-            key={key}
+            key={job._id}
             job={{ ...job, columnId: job.columnId || column._id }}
-            columns={}
+            columns={sortedColumns}
           />
         ))}
         <CreateJobApplicationDialog columnId={column._id} boardId={boardId} />
@@ -115,7 +115,7 @@ function SortableJobCard({
 }) {
   return (
     <div>
-      <JobApplicationCard />
+      <JobApplicationCard job={job} columns={columns} />
     </div>
   );
 }
