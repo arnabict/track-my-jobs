@@ -1,6 +1,6 @@
 import { Column, JobApplication } from "@/lib/models/models.types";
 import { Card, CardContent } from "./ui/card";
-import { Edit2, ExternalLink, MoreVertical } from "lucide-react";
+import { Edit2, ExternalLink, MoreVertical, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
