@@ -53,7 +53,8 @@ export default function JobApplicationCard({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>
-                    <Edit2 /> Edit
+                    <Edit2 />
+                    Edit
                   </DropdownMenuItem>
                   {columns.length > 1 && (
                     <>
@@ -66,6 +67,10 @@ export default function JobApplicationCard({
                         ))}
                     </>
                   )}
+                  <DropdownMenuItem>
+                    <Trash2 />
+                    Delete
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
