@@ -1,6 +1,6 @@
 import { Column, JobApplication } from "@/lib/models/models.types";
 import { Card, CardContent } from "./ui/card";
-import { Edit2, ExternalLink, MoreVertical } from "lucide-react";
+import { Edit2, ExternalLink, MoreVertical, Trash2 } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -64,7 +64,8 @@ export default function JobApplicationCard({
                 </DropdownMenuTrigger>
                 <DropdownMenuContent align="end">
                   <DropdownMenuItem>
-                    <Edit2 /> Edit
+                    <Edit2 />
+                    Edit
                   </DropdownMenuItem>
                   {columns.length > 1 && (
                     <>
@@ -77,6 +78,10 @@ export default function JobApplicationCard({
                         ))}
                     </>
                   )}
+                  <DropdownMenuItem>
+                    <Trash2 />
+                    Delete
+                  </DropdownMenuItem>
                 </DropdownMenuContent>
               </DropdownMenu>
             </div>
