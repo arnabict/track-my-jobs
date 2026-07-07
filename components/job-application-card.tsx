@@ -20,17 +20,28 @@ export default function JobApplicationCard({
 }: JobApplicationCardProps) {
   return (
     <>
-      <Card>
-        <CardContent>
-          <div>
-            <div>
-              <h3>{job.position}</h3>
-              <p>{job.company}</p>
-              {job.description && <p>{job.description}</p>}
+      <Card className="cursor-pointer transition-shadow hover:shadow-2xl">
+        <CardContent className="p-4">
+          <div className="flex items-start justify-between gap-2">
+            <div className="flex-1 min-w-0">
+              <h3 className="font-semibold text-sm mb-1">{job.position}</h3>
+              <p className="text-xs text-muted-foreground mb-2">
+                {job.company}
+              </p>
+              {job.description && (
+                <p className="text-xs text-muted-foreground mb-2 line-clamp-1">
+                  {job.description}
+                </p>
+              )}
               {job.tags && job.tags.length > 0 && (
-                <div>
+                <div className="flex flex-wrap gap-1 mb-2">
                   {job.tags.map((tag, key) => (
-                    <span key={key}>{tag}</span>
+                    <span
+                      key={key}
+                      className="px-2 py-0.5 text-xs rounded-full bg-accent"
+                    >
+                      {tag}
+                    </span>
                   ))}
                 </div>
               )}
@@ -59,8 +70,8 @@ export default function JobApplicationCard({
                     <>
                       {columns
                         .filter((c) => c._id !== job.columnId)
-                        .map((column) => (
-                          <DropdownMenuItem>
+                        .map((column, key) => (
+                          <DropdownMenuItem key={key}>
                             Move to {column.name}
                           </DropdownMenuItem>
                         ))}
