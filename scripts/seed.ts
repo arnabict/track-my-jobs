@@ -2,6 +2,7 @@ import connectDB from "../lib/db";
 import "@/lib/models";
 import { Board, Column, JobApplication } from "@/lib/models";
 
+// From MONGODB for current loggged in user
 const USER_ID = "6929e34361b6f083d154859d";
 
 const SAMPLE_JOBS = [
