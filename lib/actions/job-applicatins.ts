@@ -1,5 +1,6 @@
 "use server";
 
+import { revalidatePath } from "next/cache";
 import { getSession } from "../auth/auth";
 import connectDB from "../db";
 import { Board, Column, JobApplication } from "../models";
@@ -182,7 +183,7 @@ export async function updateJobApplication(
     updatesToApply.order = newOrderValue;
 
     await Column.findByIdAndUpdate(newColumnId, {
-      $push: { jobApplication: id },
+      $push: { jobApplications: id },
     });
   } else if (order !== undefined && order !== null) {
     const otherJobsInColumn = await JobApplication.find({
@@ -219,7 +220,7 @@ export async function updateJobApplication(
       for (const job of jobsToshiftUp) {
         const newOrder = Math.max(0, job.order - 100);
         await JobApplication.findByIdAndUpdate(job._id, {
-          $set: { order: job.order + 100 },
+          $set: { order: newOrder },
         });
       }
     }
@@ -231,5 +232,6 @@ export async function updateJobApplication(
     new: true,
   });
 
+  revalidatePath("/dashboard");
   return { data: JSON.parse(JSON.stringify(updated)) };
 }
