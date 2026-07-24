@@ -3,7 +3,7 @@ import "@/lib/models";
 import { Board, Column, JobApplication } from "@/lib/models";
 
 // From MONGODB for current loggged in user
-const USER_ID = "6929e34361b6f083d154859d";
+const USER_ID = "6a4cf25c16fa8928b465b299";
 
 const SAMPLE_JOBS = [
   // Wish List
