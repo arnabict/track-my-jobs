@@ -69,7 +69,7 @@ function DroppableColumn({
     column.jobApplications?.sort((a, b) => a.order - b.order) || [];
 
   return (
-    <Card className="min-w-[300px] shrink-0 shadow-md p-0">
+    <Card className="min-w-75 shrink-0 shadow-md p-0">
       <CardHeader
         className={`${config.color} text-white rounded-t-lg pb-3 pt-3`}
       >
@@ -93,7 +93,7 @@ function DroppableColumn({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 pt-4 bg-gray-50/50 min-h-[400px] rounded-b-lg">
+      <CardContent className="space-y-2 pt-4 bg-gray-50/50 min-h-100 rounded-b-lg">
         {sortedJobs.map((job) => (
           <SortableJobCard
             key={job._id}
