@@ -21,6 +21,20 @@ import { Board, Column, JobApplication } from "@/lib/models/models.types";
 import CreateJobApplicationDialog from "./create-job-application-dialog";
 import JobApplicationCard from "./job-application-card";
 import { useBoard } from "@/lib/hooks/useBoards";
+import {
+  closestCorners,
+  DndContext,
+  PointerSensor,
+  useDroppable,
+  useSensor,
+  useSensors,
+} from "@dnd-kit/core";
+import {
+  SortableContext,
+  useSortable,
+  verticalListSortingStrategy,
+} from "@dnd-kit/sortable";
+import { CSS } from "@dnd-kit/utilities";
 interface KanbanBoardProps {
   board: Board;
   userId?: string;
@@ -65,6 +79,14 @@ function DroppableColumn({
   boardId: string;
   sortedColumns: Column[];
 }) {
+  const { setNodeRef, isOver } = useDroppable({
+    id: column._id,
+    data: {
+      type: "column",
+      columnId: column._id,
+    },
+  });
+
   const sortedJobs =
     column.jobApplications?.sort((a, b) => a.order - b.order) || [];
 
@@ -81,7 +103,10 @@ function DroppableColumn({
             </CardTitle>
           </div>
           <DropdownMenu>
-            <DropdownMenuTrigger className="inline-flex h-6 w-6 items-center justify-center rounded-md text-white hover:bg-white/20">
+            <DropdownMenuTrigger
+              className="inline-flex h-6 w-6 items-center justify-center 
+            rounded-md text-white hover:bg-white/20"
+            >
               <MoreVertical className="h-4 w-4" />
             </DropdownMenuTrigger>
             <DropdownMenuContent align="end">
@@ -93,14 +118,25 @@ function DroppableColumn({
           </DropdownMenu>
         </div>
       </CardHeader>
-      <CardContent className="space-y-2 pt-4 bg-gray-50/50 min-h-100 rounded-b-lg">
-        {sortedJobs.map((job) => (
-          <SortableJobCard
-            key={job._id}
-            job={{ ...job, columnId: job.columnId || column._id }}
-            columns={sortedColumns}
-          />
-        ))}
+
+      <CardContent
+        ref={setNodeRef}
+        className={`space-y-2 pt-4 bg-gray-50/50 min-h-100 rounded-b-lg 
+          ${isOver ? "ring-2 ring-blue-500" : ""}`}
+      >
+        <SortableContext
+          items={sortedJobs.map((job) => job._id)}
+          strategy={verticalListSortingStrategy}
+        >
+          {sortedJobs.map((job) => (
+            <SortableJobCard
+              key={job._id}
+              job={{ ...job, columnId: job.columnId || column._id }}
+              columns={sortedColumns}
+            />
+          ))}
+        </SortableContext>
+
         <CreateJobApplicationDialog columnId={column._id} boardId={boardId} />
       </CardContent>
     </Card>
@@ -114,9 +150,33 @@ function SortableJobCard({
   job: JobApplication;
   columns: Column[];
 }) {
+  const {
+    attributes,
+    listeners,
+    transform,
+    transition,
+    isDragging,
+    setNodeRef,
+  } = useSortable({
+    id: job._id,
+    data: {
+      type: "job",
+      job,
+    },
+  });
+
+  const style = {
+    transform: CSS.Transform.toString(transform),
+    transition,
+    opacity: isDragging ? 0.5 : 1,
+  };
   return (
-    <div>
-      <JobApplicationCard job={job} columns={columns} />
+    <div ref={setNodeRef} style={style}>
+      <JobApplicationCard
+        job={job}
+        columns={columns}
+        dragHandleProps={{ ...attributes, ...listeners }}
+      />
     </div>
   );
 }
@@ -126,8 +186,25 @@ export default function KanbanBoard({ board }: KanbanBoardProps) {
 
   const sortedColumns = columns.sort((a, b) => a.order - b.order) || [];
 
+  const sensors = useSensors(
+    useSensor(PointerSensor, {
+      activationConstraint: {
+        distance: 8,
+      },
+    }),
+  );
+
+  async function handleDragStart() {}
+
+  async function handleDragEnd() {}
+
   return (
-    <>
+    <DndContext
+      sensors={sensors}
+      collisionDetection={closestCorners}
+      onDragStart={handleDragStart}
+      onDragEnd={handleDragEnd}
+    >
       <div>
         <div>
           {columns.map((col, key) => {
@@ -147,6 +224,6 @@ export default function KanbanBoard({ board }: KanbanBoardProps) {
           })}
         </div>
       </div>
-    </>
+    </DndContext>
   );
 }
