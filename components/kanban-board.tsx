@@ -37,7 +37,6 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
-import jobApplication from "@/lib/models/job-application";
 interface KanbanBoardProps {
   board: Board;
   userId?: string;
@@ -188,7 +187,7 @@ function SortableJobCard({
 export default function KanbanBoard({ board }: KanbanBoardProps) {
   const [activeId, setActiveId] = useState<string | null>(null);
 
-  const { columns } = useBoard(board);
+  const { columns, moveJob } = useBoard(board);
 
   const sortedColumns = columns.sort((a, b) => a.order - b.order) || [];
 
@@ -237,6 +236,66 @@ export default function KanbanBoard({ board }: KanbanBoardProps) {
     const targetJob = sortedColumns
       .flatMap((col) => col.jobApplications || [])
       .find((job) => job._id === overId);
+
+    let targetColumnId: string;
+    let newOrder: number;
+
+    if (targetColumn) {
+      targetColumnId = targetColumn._id;
+      const jobsInTarget =
+        targetColumn.jobApplications
+          .filter((i) => i._id !== activeId)
+          .sort((a, b) => a.order - b.order) || [];
+      newOrder = jobsInTarget.length;
+    } else if (targetJob) {
+      const targetJobColumn = sortedColumns.find((col) =>
+        col.jobApplications.some((i) => i._id === targetJob._id),
+      );
+      targetColumnId = targetJob.columnId || targetJobColumn?._id || "";
+      if (!targetColumnId) return;
+
+      const targetColumnObj = sortedColumns.find(
+        (col) => col._id === targetColumnId,
+      );
+
+      if (!targetColumnObj) return;
+
+      const allJobsInTargetOriginal =
+        targetColumnObj.jobApplications.sort((a, b) => a.order - b.order) || [];
+
+      const allJobsInTargetFiltered =
+        allJobsInTargetOriginal.filter((i) => i._id !== activeId) || [];
+
+      const targetIndexInOriginal = allJobsInTargetOriginal.findIndex(
+        (i) => i._id === overId,
+      );
+
+      const targetIndexInFiltered = allJobsInTargetFiltered.findIndex(
+        (i) => i._id === overId,
+      );
+
+      if (targetIndexInFiltered !== -1) {
+        if (sourceColumn._id === targetColumnId) {
+          if (sourceIndex < targetIndexInOriginal) {
+            newOrder = targetIndexInFiltered + 1;
+          } else {
+            newOrder = targetIndexInFiltered;
+          }
+        } else {
+          newOrder = targetIndexInFiltered;
+        }
+      } else {
+        newOrder = allJobsInTargetFiltered.length;
+      }
+    } else {
+      return;
+    }
+
+    if (!targetColumnId) {
+      return;
+    }
+
+    await moveJob(activeId, targetColumnId, newOrder);
   }
 
   return (
