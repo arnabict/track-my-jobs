@@ -9,7 +9,7 @@ import {
   Trash2,
   XCircle,
 } from "lucide-react";
-import type { ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { Card, CardContent, CardHeader, CardTitle } from "./ui/card";
 import {
   DropdownMenu,
@@ -24,6 +24,8 @@ import { useBoard } from "@/lib/hooks/useBoards";
 import {
   closestCorners,
   DndContext,
+  DragEndEvent,
+  DragStartEvent,
   PointerSensor,
   useDroppable,
   useSensor,
@@ -35,6 +37,7 @@ import {
   verticalListSortingStrategy,
 } from "@dnd-kit/sortable";
 import { CSS } from "@dnd-kit/utilities";
+import jobApplication from "@/lib/models/job-application";
 interface KanbanBoardProps {
   board: Board;
   userId?: string;
@@ -170,6 +173,7 @@ function SortableJobCard({
     transition,
     opacity: isDragging ? 0.5 : 1,
   };
+
   return (
     <div ref={setNodeRef} style={style}>
       <JobApplicationCard
@@ -182,6 +186,8 @@ function SortableJobCard({
 }
 
 export default function KanbanBoard({ board }: KanbanBoardProps) {
+  const [activeId, setActiveId] = useState<string | null>(null);
+
   const { columns } = useBoard(board);
 
   const sortedColumns = columns.sort((a, b) => a.order - b.order) || [];
@@ -194,9 +200,44 @@ export default function KanbanBoard({ board }: KanbanBoardProps) {
     }),
   );
 
-  async function handleDragStart() {}
+  async function handleDragStart(event: DragStartEvent) {
+    setActiveId(event.active.id as string);
+  }
 
-  async function handleDragEnd() {}
+  async function handleDragEnd(event: DragEndEvent) {
+    const { active, over } = event;
+
+    setActiveId(null);
+
+    if (!over || !board._id) return;
+
+    const activeId = active.id as string;
+    const overId = active.id as string;
+
+    let draggedJob: JobApplication | null = null;
+    let sourceColumn: Column | null = null;
+    let sourceIndex = -1;
+
+    for (const column of sortedColumns) {
+      const jobs =
+        column.jobApplications.sort((a, b) => a.order - b.order) || [];
+      const jobIndex = jobs.findIndex((i) => i._id === activeId);
+
+      if (jobIndex !== -1) {
+        draggedJob = jobs[jobIndex];
+        sourceColumn = column;
+        sourceIndex = jobIndex;
+        break;
+      }
+    }
+
+    if (!draggedJob || !sourceColumn) return;
+
+    const targetColumn = sortedColumns.find((col) => col._id === overId);
+    const targetJob = sortedColumns
+      .flatMap((col) => col.jobApplications || [])
+      .find((job) => job._id === overId);
+  }
 
   return (
     <DndContext
@@ -205,8 +246,8 @@ export default function KanbanBoard({ board }: KanbanBoardProps) {
       onDragStart={handleDragStart}
       onDragEnd={handleDragEnd}
     >
-      <div>
-        <div>
+      <div className="space-y-4">
+        <div className="flex gap-4 overflow-x-auto pb-4">
           {columns.map((col, key) => {
             const config = COLUMN_CONFIG[key] || {
               color: "bg-gray-500",
