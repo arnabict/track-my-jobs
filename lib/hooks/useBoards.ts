@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { Board, Column, JobApplication } from "../models/models.types";
+import { updateJobApplication } from "../actions/job-applicatins";
 
 export function useBoard(initialBoard?: Board | null) {
   const [board, setBoard] = useState<Board | null>(initialBoard || null);
@@ -71,6 +72,16 @@ export function useBoard(initialBoard?: Board | null) {
       }
       return newColumns;
     });
+
+    try {
+      const result = await updateJobApplication(jobApplicationId, {
+        columnId: newColumnId,
+        order: newOrder,
+      });
+      console.log(result);
+    } catch (err) {
+      console.error("Error", err);
+    }
   }
 
   return { board, columns, error, moveJob };
